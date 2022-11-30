@@ -1,4 +1,4 @@
-# Kwalee-test-assignment
+# test-assignment
 
 To initialise the project run Yarn in root and in packages folders.
 
