@@ -1,19 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  GameContext,
-  GameContextProvider,
-  GameData,
-} from '../context/GameContext';
-import { ScrollableTabGroup } from '../components/ScrollableTabGroup';
+import { GameContext, GameContextProvider } from '../context/GameContext';
+import { filterCategories } from '../context/ContextConstants';
+import { DateScrollableTabGroup } from '../components/DateScrollableTabGroup';
 import { TabGroupPlain } from '../components/TabGroupPlain';
-import dayjs from 'dayjs';
-import weekday from 'dayjs/plugin/weekday';
+import { ChartContainer } from '../components/ChartContainer';
 import styled from 'styled-components';
-import { number } from 'yup/lib/locale';
-import { string } from 'yup';
-
-dayjs.extend(weekday);
-dayjs().localeData();
+import { FilterCategoryTabType } from '../types/contextTypes';
 
 const periods = [
   { id: 1, name: 'Weekly', value: 'WEEKLY' },
@@ -21,109 +13,15 @@ const periods = [
   { id: 3, name: 'Yearly', value: 'YEARLY' },
 ];
 
-type PeriodType = {
-  id: number;
-  name: string;
-  value: string;
-};
-
-type FilterCategoryType = 'Country' | 'App' | 'Platform';
-
-const filterCategories: FilterCategoryTabType[] = [
-  {
-    id: 1,
-    name: 'Country',
-    value: 'Country',
-  },
-  {
-    id: 2,
-    name: 'App',
-    value: 'App',
-  },
-  {
-    id: 3,
-    name: 'Platform',
-    value: 'Platform',
-  },
-];
-
-type FilterCategoryTabType = {
-  id: number;
-  name: string;
-  value: FilterCategoryType;
-};
-
-type TimeFrame = {
-  startDate: string;
-  endDate: string;
-  period: PeriodType;
-};
-
 export const MainComponent = () => {
-  const { jsonData } = useContext(GameContext);
-  const [selectedFilterCategory, setSelectedFilterCategory] = useState(
-    filterCategories[0]
-  );
-  const [timeFrame, setTimeFrame] = useState({
-    startDate: dayjs().weekday(0).format('MM/DD/YYYY'),
-    endDate: dayjs().weekday(6).format('MM/DD/YYYY'),
-    period: periods[0],
-  });
-  const [filteredData, setFilteredData] = useState<any>({});
-
-  const selectFilterCategory = (id: number) => {
-    const selectedFilterCategory = filterCategories.filter(
-      (category) => category.id === id
-    );
-    setSelectedFilterCategory(selectedFilterCategory[0]);
-  };
-
-  const selectPeriod = (id: number) => {
-    const selectedPeriod = periods.filter((period) => period.id === id);
-    setTimeFrame((prev) => {
-      return {
-        ...prev,
-        period: selectedPeriod[0],
-      };
-    });
-  };
-
-  useEffect(() => {
-    console.log(timeFrame);
-    filterByType(selectedFilterCategory.value, timeFrame);
-  }, [selectedFilterCategory, timeFrame]);
-
-  useEffect(() => {
-    if (jsonData) filterByType(selectedFilterCategory.value, timeFrame);
-  }, [jsonData]);
-
-  const filterByType = (
-    filterType: FilterCategoryType,
-    timeFrame: TimeFrame
-  ) => {
-    let filterObject: any = {};
-    jsonData?.forEach((entry: GameData) => {
-      let key = entry[filterType];
-      if (!(key in filterObject)) {
-        filterObject[key] = [];
-        filterObject[key].push(entry);
-      } else {
-        filterObject[key].push(entry);
-      }
-      setFilteredData(filterObject);
-    });
-  };
-  const filterByDate = () => {};
-
-  const onTimeSelection = (
-    startDate: string,
-    endDate: string,
-    periodId: number
-  ) => {
-    setTimeFrame((prev) => {
-      return { ...prev, startDate, endDate };
-    });
-  };
+  const {
+    selectFilterCategory,
+    selectedFilterCategory,
+    filteredData,
+    selectPeriod,
+    timeFrame,
+    onTimeSelection,
+  } = useContext(GameContext);
 
   return (
     <Container>
@@ -135,7 +33,7 @@ export const MainComponent = () => {
           position={'center'}
           justifyContent={true}
         />
-        <ScrollableTabGroup
+        <DateScrollableTabGroup
           selectedPeriod={timeFrame.period.id}
           onTabSelected={onTimeSelection}
         />
@@ -147,8 +45,9 @@ export const MainComponent = () => {
           justifyContent={true}
         />
       </TabContainer>
+
       <ChartsContainer>
-        {filteredData && JSON.stringify(filteredData, null, 3)}
+        <ChartContainer />
       </ChartsContainer>
     </Container>
   );
@@ -170,10 +69,17 @@ const TabContainer = styled.div`
   flex-direction: row;
   height: 80px;
   width: 100%;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+  }
 `;
 
 const ChartsContainer = styled.div`
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
   height: 80vh;
   overflow-y: hidden;
 `;

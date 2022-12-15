@@ -8,7 +8,6 @@ type Props = {
   selected: number;
   onTabSelected: (periodId: number) => void;
   position?: 'start' | 'end' | 'center';
-
   justifyContent?: boolean;
 };
 
@@ -47,13 +46,14 @@ const TabContainer = styled.div<{
   align-items: center;
   padding-right: 8px;
   justify-content: ${({ position }) => (position ? position : 'center')};
+  gap: 4px;
 `;
 
 const Tab = styled.div<{ selected?: boolean; selectedBgColor?: string }>`
   display: flex;
   align-items: center;
   min-height: 32px;
-  background-color: grey;
+  background-color: ${({ selected }) => (selected ? 'grey' : 'white')};
   padding: 0 12px;
   border-radius: 8px;
 

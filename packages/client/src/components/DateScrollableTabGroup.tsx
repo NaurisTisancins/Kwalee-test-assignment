@@ -46,7 +46,7 @@ type Props = {
   onTabSelected: (startDate: string, endDate: string, periodId: number) => void;
 };
 
-export const ScrollableTabGroup: FC<Props> = ({
+export const DateScrollableTabGroup: FC<Props> = ({
   selectedPeriod = 1,
   onTabSelected,
 }) => {
@@ -273,6 +273,7 @@ export const TabsMidContainer = styled.div`
   flex-grow: 1;
   overflow-x: auto;
   width: 100%;
+  gap: 4px;
 
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -316,5 +317,3 @@ export const TabElementIcon = styled.div`
   height: 16px;
   width: 16px;
 `;
-
-export default ScrollableTabGroup;
